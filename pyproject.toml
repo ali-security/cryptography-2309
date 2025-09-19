@@ -77,6 +77,7 @@ test = [
     "pytest-xdist >=3.5.0",
     "pretend >=0.7",
     "certifi >=2024",
+    "pyjwt",
 ]
 test-randomorder = ["pytest-randomly"]
 docs = [
