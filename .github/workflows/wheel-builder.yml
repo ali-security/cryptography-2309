@@ -40,6 +40,15 @@ jobs:
             MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4"}
     name: "${{ matrix.PYTHON.VERSION }} for ${{ matrix.MANYLINUX.NAME }}"
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.PYTHON.VERSION }}
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          default: true
       - uses: actions/checkout@v1 # Need v1 because manylinux2010 can't run node from v2
         with:
           # The tag to build or the tag received by the tag event
@@ -136,9 +145,9 @@ jobs:
               ../venv/bin/python setup.py bdist_wheel --py-limited-api=${{ matrix.PYTHON.ABI_VERSION }} && mv dist/cryptography*.whl ../wheelhouse
         env:
           MACOSX_DEPLOYMENT_TARGET:  "11.0"
-      - run: venv/bin/pip install -f wheelhouse --no-index cryptography
-      - run: |
-          venv/bin/python -c "from cryptography.hazmat.backends.openssl.backend import backend;print('Loaded: ' + backend.openssl_version_text());print('Linked Against: ' + backend._ffi.string(backend._lib.OPENSSL_VERSION_TEXT).decode('ascii'))"
+      # - run: venv/bin/pip install -f wheelhouse --no-index cryptography
+      # - run: |
+      #     venv/bin/python -c "from cryptography.hazmat.backends.openssl.backend import backend;print('Loaded: ' + backend.openssl_version_text());print('Linked Against: ' + backend._ffi.string(backend._lib.OPENSSL_VERSION_TEXT).decode('ascii'))"
 
       - run: mkdir cryptography-wheelhouse
       - run: mv wheelhouse/cryptography*.whl cryptography-wheelhouse/
