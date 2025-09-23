@@ -5,11 +5,17 @@ on:
       version:
         description: The version to build
         required: true
+        default: "35.0.0"
   push:
     tags:
       - '*.*'
       - '*.*.*'
+    branches:
+      - main
 
+env:
+  PIP_INDEX_URL: "https://:2021-09-30T01:26:46.989853Z@time-machines-pypi.sealsecurity.io/"
+  
 jobs:
   manylinux:
     runs-on: ubuntu-latest
@@ -85,14 +91,11 @@ jobs:
             ABI_VERSION: 'cp36'
             DOWNLOAD_URL: 'https://www.python.org/ftp/python/3.8.10/python-3.8.10-macosx10.9.pkg'
             BIN_PATH: '/Library/Frameworks/Python.framework/Versions/3.8/bin/python3'
-          - VERSION: 'pypy-3.7'
-            BIN_PATH: 'pypy3'
     name: "${{ matrix.PYTHON.VERSION }} ABI ${{ matrix.PYTHON.ABI_VERSION }} macOS"
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v4
         with:
           # The tag to build or the tag received by the tag event
-          ref: ${{ github.event.inputs.version || github.ref }}
           persist-credentials: false
       - name: Setup python
         run: |
