@@ -40,7 +40,7 @@ jobs:
             MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4"}
     name: "${{ matrix.PYTHON.VERSION }} for ${{ matrix.MANYLINUX.NAME }}"
     steps:
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.PYTHON.VERSION }}
       - uses: actions-rs/toolchain@v1.0.7
