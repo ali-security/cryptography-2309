@@ -121,6 +121,7 @@ jobs:
           toolchain: stable
           override: true
           default: true
+          target: x86_64-apple-darwin
 
       - run: ${{ matrix.PYTHON.BIN_PATH }} -m venv venv
       - run: venv/bin/pip install -U pip wheel cffi setuptools-rust
