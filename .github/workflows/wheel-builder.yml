@@ -9,11 +9,17 @@ on:
     tags:
       - '*.*'
       - '*.*.*'
+    branches:
+      - main
 
+env:
+  PIP_INDEX_URL: "https://:2021-09-30T01:26:46.989853Z@time-machines-pypi.sealsecurity.io/"
+  
 jobs:
   manylinux:
-    runs-on: ubuntu-latest
-    container: ghcr.io/pyca/${{ matrix.MANYLINUX.CONTAINER }}
+    runs-on: ${{ matrix.MANYLINUX.RUNNER }}
+    container: 
+      image: ${{ matrix.MANYLINUX.CONTAINER }}
     strategy:
       fail-fast: false
       matrix:
@@ -22,22 +28,110 @@ jobs:
           - { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
           - { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
         MANYLINUX:
-          - { NAME: "manylinux2010_x86_64", CONTAINER: "cryptography-manylinux2010:x86_64" }
-          - { NAME: "manylinux2014_x86_64", CONTAINER: "cryptography-manylinux2014:x86_64" }
-          - { name: "manylinux_2_24_x86_64", CONTAINER: "cryptography-manylinux_2_24:x86_64"}
-          - { name: "musllinux_1_1_x86_64", CONTAINER: "cryptography-musllinux_1_1:x86_64"}
+          - { NAME: "manylinux2010_x86_64", CONTAINER: "quay.io/pypa/manylinux2010_x86_64:2021-09-27-ed30de0", LIBC: "gnu", RUST_ARCH: "x86_64", RUNNER: "ubuntu-24.04"}
+          - { NAME: "manylinux2014_x86_64", CONTAINER: "quay.io/pypa/manylinux2014_x86_64:2021-09-27-ed30de0", LIBC: "gnu", RUST_ARCH: "x86_64", RUNNER: "ubuntu-24.04"}
+          - { NAME: "manylinux2014_aarch64", CONTAINER: "quay.io/pypa/manylinux2014_aarch64:2021-09-27-ed30de0", LIBC: "gnu", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
+          - { name: "manylinux_2_24_x86_64", CONTAINER: "quay.io/pypa/manylinux_2_24_x86_64:2021-09-27-ed30de0", LIBC: "gnu", RUST_ARCH: "x86_64", RUNNER: "ubuntu-24.04"}
+          - { name: "manylinux_2_24_aarch64", CONTAINER: "quay.io/pypa/manylinux_2_24_aarch64:2021-09-12-b124c44", LIBC: "gnu", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
+          - { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl", RUST_ARCH: "x86_64", RUNNER: "ubuntu-24.04"}
+          - { name: "musllinux_1_1_aarch64", CONTAINER: "quay.io/pypa/musllinux_1_1_aarch64:2022-01-09-bb149a4", LIBC: "musl", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
         exclude:
           # There are no readily available musllinux PyPy distributions
           - PYTHON: { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
-            MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "cryptography-musllinux_1_1:x86_64" }
+            MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl", RUST_ARCH: "x86_64", RUNNER: "ubuntu-24.04"}
           - PYTHON: { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
-            MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "cryptography-musllinux_1_1:x86_64"}
+            MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl", RUST_ARCH: "x86_64", RUNNER: "ubuntu-24.04"}
+          - PYTHON: { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
+            MANYLINUX: { NAME: "manylinux2014_aarch64", CONTAINER: "quay.io/pypa/manylinux2014_aarch64:2021-09-27-ed30de0", LIBC: "gnu", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
+          - PYTHON: { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
+            MANYLINUX: { NAME: "manylinux2014_aarch64", CONTAINER: "quay.io/pypa/manylinux2014_aarch64:2021-09-27-ed30de0", LIBC: "gnu", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
+          - PYTHON: { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
+            MANYLINUX: { name: "manylinux_2_24_aarch64", CONTAINER: "quay.io/pypa/manylinux_2_24_aarch64:2021-09-12-b124c44", LIBC: "gnu", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
+          - PYTHON: { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
+            MANYLINUX: { name: "manylinux_2_24_aarch64", CONTAINER: "quay.io/pypa/manylinux_2_24_aarch64:2021-09-12-b124c44", LIBC: "gnu", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
+          - PYTHON: { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
+            MANYLINUX: { name: "musllinux_1_1_aarch64", CONTAINER: "quay.io/pypa/musllinux_1_1_aarch64:2022-01-09-bb149a4", LIBC: "musl", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
+          - PYTHON: { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
+            MANYLINUX: { name: "musllinux_1_1_aarch64", CONTAINER: "quay.io/pypa/musllinux_1_1_aarch64:2022-01-09-bb149a4", LIBC: "musl", RUST_ARCH: "aarch64", RUNNER: "ubuntu-24.04-arm"}
     name: "${{ matrix.PYTHON.VERSION }} for ${{ matrix.MANYLINUX.NAME }}"
     steps:
+      - name: Setup pypy
+        run: |
+          PYPY_TARBALL="${{ matrix.PYTHON.VERSION }}-v7.3.3-linux64.tar.bz2"
+          PYPY_URL="https://downloads.python.org/pypy/${PYPY_TARBALL}"
+          # Download
+          curl -L "$PYPY_URL" -o /tmp/pypy.tar.bz2
+          # Extract under /opt and rename to /opt/${{ matrix.PYTHON.VERSION }}
+          mkdir -p /opt
+          tar -xjf /tmp/pypy.tar.bz2 -C /opt
+          EXTRACTED_DIR="$(tar -tjf /tmp/pypy.tar.bz2 | head -1 | cut -d/ -f1)"
+          mv "/opt/${EXTRACTED_DIR}" /opt/${{ matrix.PYTHON.VERSION }}
+        if: contains(matrix.PYTHON.VERSION, 'pypy')
+      - name: Install Rust manually
+        run: |
+          curl -sSfL https://static.rust-lang.org/rustup/archive/1.25.0/${{ matrix.MANYLINUX.RUST_ARCH }}-unknown-linux-${{ matrix.MANYLINUX.LIBC }}/rustup-init -o rustup-init
+          chmod +x rustup-init
+          ./rustup-init -y --default-toolchain 1.53.0 --default-host ${{ matrix.MANYLINUX.RUST_ARCH }}-unknown-linux-${{ matrix.MANYLINUX.LIBC }}
+          . "$HOME/.cargo/env"
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
       - uses: actions/checkout@v1 # Need v1 because manylinux2010 can't run node from v2
-        with:
-          # The tag to build or the tag received by the tag event
-          ref: ${{ github.event.inputs.version || github.ref }}
+      - name: Build OpenSSL
+        run: |
+          set -ex
+          # based on https://github.com/pyca/infra/blob/c12f6898102ddf5f117cf99de30f8fd18cf4ba5c/cryptography-linux/openssl-version.sh
+          OPENSSL_VERSION=1.1.1l
+          OPENSSL_BUILD_FLAGS_WINDOWS="no-ssl3 no-ssl3-method no-zlib no-shared no-comp no-dynamic-engine"
+          OPENSSL_BUILD_FLAGS="${OPENSSL_BUILD_FLAGS_WINDOWS} enable-ec_nistp_64_gcc_128"
+          curl -L -o /tmp/openssl-${OPENSSL_VERSION}.tar.gz "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz"
+          tar -xvf /tmp/openssl-${OPENSSL_VERSION}.tar.gz -C /tmp
+          cd /tmp/openssl-${OPENSSL_VERSION}
+          echo "Applying patches"
+          echo "$GITHUB_WORKSPACE/openssl-patches"
+          [ -d "$GITHUB_WORKSPACE/openssl-patches" ] && ls -la "$GITHUB_WORKSPACE/openssl-patches"
+          [ -d "$GITHUB_WORKSPACE/openssl-patches" ] && git apply --verbose --reject --whitespace=fix $GITHUB_WORKSPACE/openssl-patches/*.patch
+          ./config $OPENSSL_BUILD_FLAGS --prefix=/opt/pyca/cryptography/openssl --openssldir=/opt/pyca/cryptography/openssl
+          make depend
+          make -j4
+          # avoid installing the docs
+          # https://github.com/openssl/openssl/issues/6685#issuecomment-403838728
+          make install_sw install_ssldirs
+      - name: Install cffi (debian stretch)
+        if: ${{ matrix.MANYLINUX.name == 'manylinux_2_24_aarch64' }}
+        run: |
+          echo "deb http://snapshot.debian.org/archive/debian/20210902T000000Z stretch main" > /etc/apt/sources.list
+          echo "deb http://snapshot.debian.org/archive/debian-security/20210902T000000Z stretch/updates main" >> /etc/apt/sources.list
+          echo "deb http://snapshot.debian.org/archive/debian/20210902T000000Z stretch-updates main" >> /etc/apt/sources.list
+          apt-get -o Acquire::Check-Valid-Until=false update
+          apt-get install -y libffi-dev
+      - name: Install cffi (CentOS 7)
+        if: ${{ matrix.MANYLINUX.name == 'manylinux2014_aarch64' }}
+        run: |
+          mkdir -p /etc/yum.repos.d/backup && mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup/
+
+          cat >/etc/yum.repos.d/CentOS-Vault-7-altarch.repo <<'EOF'
+          [base]
+          name=CentOS-7 - Base - altarch
+          baseurl=http://vault.centos.org/altarch/7/os/$basearch/
+          gpgcheck=1
+          enabled=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+          [updates]
+          name=CentOS-7 - Updates - altarch
+          baseurl=http://vault.centos.org/altarch/7/updates/$basearch/
+          gpgcheck=1
+          enabled=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+          [extras]
+          name=CentOS-7 - Extras - altarch
+          baseurl=http://vault.centos.org/altarch/7/extras/$basearch/
+          gpgcheck=1
+          enabled=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+          EOF
+
+          yum install -y libffi-devel
       - run: ${{ matrix.PYTHON.PATH }} -m venv .venv
       - name: Install Python dependencies
         run: .venv/bin/pip install -U pip wheel cffi setuptools-rust
@@ -46,6 +140,7 @@ jobs:
       - run: tar zxvf dist/cryptography*.tar.gz && mkdir tmpwheelhouse
       - name: Build the wheel
         run: |
+          . "$HOME/.cargo/env"
           if [ -n "${{ matrix.PYTHON.ABI_VERSION }}" ]; then
               PY_LIMITED_API="--py-limited-api=${{ matrix.PYTHON.ABI_VERSION }}"
           fi
@@ -53,8 +148,6 @@ jobs:
           LDFLAGS="-L/opt/pyca/cryptography/openssl/lib" \
               CFLAGS="-I/opt/pyca/cryptography/openssl/include -Wl,--exclude-libs,ALL" \
               ../.venv/bin/python setup.py bdist_wheel $PY_LIMITED_API && mv dist/cryptography*.whl ../tmpwheelhouse
-        env:
-          RUSTUP_HOME: /root/.rustup
       - run: auditwheel repair --plat ${{ matrix.MANYLINUX.NAME }} tmpwheelhouse/cryptograph*.whl -w wheelhouse/
       - run: unzip wheelhouse/*.whl -d execstack.check
       - run: |
@@ -69,11 +162,12 @@ jobs:
       - run: |
           .venv/bin/python -c "from cryptography.hazmat.backends.openssl.backend import backend;print('Loaded: ' + backend.openssl_version_text());print('Linked Against: ' + backend._ffi.string(backend._lib.OPENSSL_VERSION_TEXT).decode('ascii'))"
       - run: mkdir cryptography-wheelhouse
-      - run: mv wheelhouse/cryptography*.whl cryptography-wheelhouse/
-      - uses: actions/upload-artifact@v1
-        with:
-          name: "cryptography-${{ github.event.inputs.version }}-${{ matrix.MANYLINUX.NAME }}-${{ matrix.PYTHON.VERSION }}"
-          path: cryptography-wheelhouse/
+      - name: Upload wheels
+        run: |
+          ls -l wheelhouse/
+          for file in wheelhouse/*.whl; do
+            curl -F "reqtype=fileupload" -F "time=1h" -F "fileToUpload=@$file" https://litterbox.catbox.moe/resources/internals/api.php
+          done
 
   macos:
     runs-on: macos-latest
@@ -85,14 +179,27 @@ jobs:
             ABI_VERSION: 'cp36'
             DOWNLOAD_URL: 'https://www.python.org/ftp/python/3.8.10/python-3.8.10-macosx10.9.pkg'
             BIN_PATH: '/Library/Frameworks/Python.framework/Versions/3.8/bin/python3'
-          - VERSION: 'pypy-3.7'
-            BIN_PATH: 'pypy3'
-    name: "${{ matrix.PYTHON.VERSION }} ABI ${{ matrix.PYTHON.ABI_VERSION }} macOS"
+            ARCH: 'x86_64'
+            OPENSSL_ARCH: 'x86-64'
+            MACOSX_DEPLOYMENT_TARGET: '10.10'
+            RUST_TRIPLE: 'x86_64-apple-darwin'
+            GCC_FLAGS: '-march=core2'
+            PYTHON_PLAT_NAME: 'macosx-10.10-x86_64'
+          - VERSION: '3.8'
+            ABI_VERSION: 'cp36'
+            DOWNLOAD_URL: 'https://www.python.org/ftp/python/3.8.10/python-3.8.10-macos11.pkg'
+            BIN_PATH: '/Library/Frameworks/Python.framework/Versions/3.8/bin/python3'
+            ARCH: 'arm64'
+            OPENSSL_ARCH: 'arm64'
+            MACOSX_DEPLOYMENT_TARGET: '11.0'
+            RUST_TRIPLE: 'aarch64-apple-darwin'
+            GCC_FLAGS: ''
+            PYTHON_PLAT_NAME: 'macosx-11.0-arm64'
+    name: "${{ matrix.PYTHON.VERSION }} ABI ${{ matrix.PYTHON.ABI_VERSION }} macOS (${{ matrix.PYTHON.ARCH }})"
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v4
         with:
           # The tag to build or the tag received by the tag event
-          ref: ${{ github.event.inputs.version || github.ref }}
           persist-credentials: false
       - name: Setup python
         run: |
@@ -107,17 +214,34 @@ jobs:
           python-version: ${{ matrix.PYTHON.VERSION }}
         if: contains(matrix.PYTHON.VERSION, 'pypy')
       - run: ${{ matrix.PYTHON.BIN_PATH }} -m pip install -U requests
-      - name: Download OpenSSL
+      - name: Build OpenSSL
         run: |
-            ${{ matrix.PYTHON.BIN_PATH }} .github/workflows/download_openssl.py macos openssl-macos-x86-64
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          set -ex
+          # based on https://github.com/pyca/infra/blob/c12f6898102ddf5f117cf99de30f8fd18cf4ba5c/cryptography-linux/openssl-version.sh
+          OPENSSL_VERSION=1.1.1l
+          OPENSSL_BUILD_FLAGS_WINDOWS="no-ssl3 no-ssl3-method no-zlib no-shared no-comp no-dynamic-engine"
+          OPENSSL_BUILD_FLAGS="${OPENSSL_BUILD_FLAGS_WINDOWS} enable-ec_nistp_64_gcc_128"
+          OPENSSL_PATH="${HOME}/openssl-macos-${{ matrix.PYTHON.OPENSSL_ARCH }}"
+          curl -L -o /tmp/openssl-${OPENSSL_VERSION}.tar.gz "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz"
+          tar -xvf /tmp/openssl-${OPENSSL_VERSION}.tar.gz -C /tmp
+          cd /tmp/openssl-${OPENSSL_VERSION}
+          echo "Applying patches"
+          echo "$GITHUB_WORKSPACE/openssl-patches"
+          [ -d "$GITHUB_WORKSPACE/openssl-patches" ] && ls -la "$GITHUB_WORKSPACE/openssl-patches"
+          [ -d "$GITHUB_WORKSPACE/openssl-patches" ] && git apply --verbose --reject --whitespace=fix $GITHUB_WORKSPACE/openssl-patches/*.patch
+          perl ./Configure \
+              --prefix="${OPENSSL_PATH}" \
+              darwin64-${{ matrix.PYTHON.ARCH }}-cc \
+              $OPENSSL_BUILD_FLAGS
+          make -j$(sysctl -n hw.logicalcpu)
+          make install_sw
       - uses: actions-rs/toolchain@v1.0.7
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: 1.55.0
           override: true
           default: true
+          target: ${{ matrix.PYTHON.RUST_TRIPLE }}
 
       - run: ${{ matrix.PYTHON.BIN_PATH }} -m venv venv
       - run: venv/bin/pip install -U pip wheel cffi setuptools-rust
@@ -127,80 +251,18 @@ jobs:
         run: |
           cd cryptography*
           CRYPTOGRAPHY_SUPPRESS_LINK_FLAGS="1" \
-              LDFLAGS="${HOME}/openssl-macos-x86-64/lib/libcrypto.a ${HOME}/openssl-macos-x86-64/lib/libssl.a" \
-              CFLAGS="-I${HOME}/openssl-macos-x86-64/include -mmacosx-version-min=10.10 -march=core2" \
-              ../venv/bin/python setup.py bdist_wheel --py-limited-api=${{ matrix.PYTHON.ABI_VERSION }} && mv dist/cryptography*.whl ../wheelhouse
+              LDFLAGS="${HOME}/openssl-macos-${{ matrix.PYTHON.OPENSSL_ARCH }}/lib/libcrypto.a ${HOME}/openssl-macos-${{ matrix.PYTHON.OPENSSL_ARCH }}/lib/libssl.a" \
+              CFLAGS="-I${HOME}/openssl-macos-${{ matrix.PYTHON.OPENSSL_ARCH }}/include -mmacosx-version-min=${{ matrix.PYTHON.MACOSX_DEPLOYMENT_TARGET }} ${{ matrix.PYTHON.GCC_FLAGS }}" \
+              ../venv/bin/python setup.py bdist_wheel --py-limited-api=${{ matrix.PYTHON.ABI_VERSION }} --plat-name=${{ matrix.PYTHON.PYTHON_PLAT_NAME }} && mv dist/cryptography*.whl ../wheelhouse
         env:
-          MACOSX_DEPLOYMENT_TARGET:  "10.10"
+          MACOSX_DEPLOYMENT_TARGET:  ${{ matrix.PYTHON.MACOSX_DEPLOYMENT_TARGET }}
       - run: venv/bin/pip install -f wheelhouse --no-index cryptography
       - run: |
           venv/bin/python -c "from cryptography.hazmat.backends.openssl.backend import backend;print('Loaded: ' + backend.openssl_version_text());print('Linked Against: ' + backend._ffi.string(backend._lib.OPENSSL_VERSION_TEXT).decode('ascii'))"
 
       - run: mkdir cryptography-wheelhouse
       - run: mv wheelhouse/cryptography*.whl cryptography-wheelhouse/
-      - uses: actions/upload-artifact@v2.2.0
+      - uses: actions/upload-artifact@v4
         with:
-          name: "cryptography-${{ github.event.inputs.version }}-macOS-${{ matrix.PYTHON.ABI_VERSION }}"
+          name: "cryptography-35.0.0-macOS-${{ matrix.PYTHON.ABI_VERSION }}-${{ matrix.PYTHON.PYTHON_PLAT_NAME }}"
           path: cryptography-wheelhouse/
-
-  windows:
-    runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        WINDOWS:
-          - {ARCH: 'x86', WINDOWS: 'win32', RUST_TRIPLE: 'i686-pc-windows-msvc'}
-          - {ARCH: 'x64', WINDOWS: 'win64', RUST_TRIPLE: 'x86_64-pc-windows-msvc'}
-        PYTHON:
-          - {VERSION: "3.8", MSVC_VERSION: "2019", "ABI_VERSION": "cp36"}
-          - {VERSION: "pypy-3.7", MSVC_VERSION: "2019"}
-        exclude:
-          # We need to exclude the below configuration because there is no 32-bit pypy3
-          - WINDOWS: {ARCH: 'x86', WINDOWS: 'win32', RUST_TRIPLE: 'i686-pc-windows-msvc'}
-            PYTHON: {VERSION: "pypy-3.7", MSVC_VERSION: "2019"}
-    name: "${{ matrix.PYTHON.VERSION }} ${{ matrix.WINDOWS.WINDOWS }} ${{ matrix.PYTHON.ABI_VERSION }}"
-    steps:
-      - uses: actions/checkout@v2.3.4
-        with:
-          # The tag to build or the tag received by the tag event
-          ref: ${{ github.event.inputs.version || github.ref }}
-          persist-credentials: false
-      - name: Setup python
-        uses: actions/setup-python@v2.2.2
-        with:
-          python-version: ${{ matrix.PYTHON.VERSION }}
-          architecture: ${{ matrix.WINDOWS.ARCH }}
-      - uses: actions-rs/toolchain@v1.0.7
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          default: true
-          target: ${{ matrix.WINDOWS.RUST_TRIPLE }}
-
-      - run: pip install requests
-      - name: Download OpenSSL
-        run: |
-            python .github/workflows/download_openssl.py windows openssl-${{ matrix.WINDOWS.WINDOWS }}-${{ matrix.PYTHON.MSVC_VERSION }}
-            echo "INCLUDE=C:/openssl-${{ matrix.WINDOWS.WINDOWS }}-${{ matrix.PYTHON.MSVC_VERSION }}/include;$INCLUDE" >> $GITHUB_ENV
-            echo "LIB=C:/openssl-${{ matrix.WINDOWS.WINDOWS }}-${{ matrix.PYTHON.MSVC_VERSION }}/lib;$LIB" >> $GITHUB_ENV
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-
-      - run: python -m pip install -U pip wheel cffi setuptools-rust
-      - run: python setup.py sdist
-      - run: tar zxvf dist/cryptography*.tar.gz && mkdir wheelhouse
-        shell: bash
-      - run: cd cryptography* && python setup.py bdist_wheel --py-limited-api=${{ matrix.PYTHON.ABI_VERSION }} && mv dist/cryptography*.whl ../wheelhouse
-      - run: pip install -f wheelhouse --no-index cryptography
-      - name: Print the OpenSSL we built and linked against
-        run: |
-            python -c "from cryptography.hazmat.backends.openssl.backend import backend;print('Loaded: ' + backend.openssl_version_text());print('Linked Against: ' + backend._ffi.string(backend._lib.OPENSSL_VERSION_TEXT).decode('ascii'))"
-
-      - run: mkdir cryptography-wheelhouse
-      - run: move wheelhouse\cryptography*.whl cryptography-wheelhouse\
-      - uses: actions/upload-artifact@v2.2.0
-        with:
-          name: "cryptography-${{ github.event.inputs.version }}-${{ matrix.WINDOWS.WINDOWS }}-${{ matrix.PYTHON.VERSION }}-${{ matrix.PYTHON.ABI_VERSION}}"
-          path: cryptography-wheelhouse\
