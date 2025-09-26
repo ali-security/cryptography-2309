@@ -27,16 +27,26 @@ jobs:
           - { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
           - { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
         MANYLINUX:
-          - { NAME: "manylinux2010_x86_64", CONTAINER: "quay.io/pypa/manylinux2010_x86_64:2021-09-27-ed30de0", LIBC: "gnu" }
-          - { NAME: "manylinux2014_x86_64", CONTAINER: "quay.io/pypa/manylinux2014_x86_64:2021-09-27-ed30de0", LIBC: "gnu" }
-          - { name: "manylinux_2_24_x86_64", CONTAINER: "quay.io/pypa/manylinux_2_24_x86_64:2021-09-27-ed30de0", LIBC: "gnu"}
-          - { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl"}
+          - { NAME: "manylinux2010_x86_64", CONTAINER: "quay.io/pypa/manylinux2010_x86_64:2021-09-27-ed30de0", LIBC: "gnu", ARCH: "x86_64"}
+          - { NAME: "manylinux2014_x86_64", CONTAINER: "quay.io/pypa/manylinux2014_x86_64:2021-09-27-ed30de0", LIBC: "gnu", ARCH: "x86_64"}
+          - { name: "manylinux_2_24_x86_64", CONTAINER: "quay.io/pypa/manylinux_2_24_x86_64:2021-09-27-ed30de0", LIBC: "gnu", ARCH: "x86_64"}
+          - { name: "manylinux_2_24_aarch64", CONTAINER: "quay.io/pypa/manylinux_2_24_aarch64:2021-09-27-ed30de0", LIBC: "gnu", ARCH: "aarch64"}
+          - { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl", ARCH: "x86_64"}
+          - { name: "musllinux_1_1_aarch64", CONTAINER: "quay.io/pypa/musllinux_1_1_aarch64:2022-01-09-bb149a4", LIBC: "musl", ARCH: "aarch64"}
         exclude:
           # There are no readily available musllinux PyPy distributions
           - PYTHON: { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
-            MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl" }
+            MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl", ARCH: "x86_64"}
           - PYTHON: { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
-            MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl" }
+            MANYLINUX: { name: "musllinux_1_1_x86_64", CONTAINER: "quay.io/pypa/musllinux_1_1_x86_64:2022-01-09-bb149a4", LIBC: "musl", ARCH: "x86_64"}
+          - PYTHON: { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
+            MANYLINUX: { name: "manylinux_2_24_aarch64", CONTAINER: "quay.io/pypa/manylinux_2_24_aarch64:2021-09-27-ed30de0", LIBC: "gnu", ARCH: "aarch64"}
+          - PYTHON: { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
+            MANYLINUX: { name: "manylinux_2_24_aarch64", CONTAINER: "quay.io/pypa/manylinux_2_24_aarch64:2021-09-27-ed30de0", LIBC: "gnu", ARCH: "aarch64"}
+          - PYTHON: { VERSION: "pypy3.6", PATH: "/opt/pypy3.6/bin/pypy" }
+            MANYLINUX: { name: "musllinux_1_1_aarch64", CONTAINER: "quay.io/pypa/musllinux_1_1_aarch64:2022-01-09-bb149a4", LIBC: "musl", ARCH: "aarch64"}
+          - PYTHON: { VERSION: "pypy3.7", PATH: "/opt/pypy3.7/bin/pypy" }
+            MANYLINUX: { name: "musllinux_1_1_aarch64", CONTAINER: "quay.io/pypa/musllinux_1_1_aarch64:2022-01-09-bb149a4", LIBC: "musl", ARCH: "aarch64"}
     name: "${{ matrix.PYTHON.VERSION }} for ${{ matrix.MANYLINUX.NAME }}"
     steps:
       - name: Setup pypy
@@ -53,9 +63,9 @@ jobs:
         if: contains(matrix.PYTHON.VERSION, 'pypy')
       - name: Install Rust manually
         run: |
-          curl -sSfL https://static.rust-lang.org/rustup/archive/1.25.0/x86_64-unknown-linux-${{ matrix.MANYLINUX.LIBC }}/rustup-init -o rustup-init
+          curl -sSfL https://static.rust-lang.org/rustup/archive/1.25.0/${{ matrix.MANYLINUX.ARCH }}-unknown-linux-${{ matrix.MANYLINUX.LIBC }}/rustup-init -o rustup-init
           chmod +x rustup-init
-          ./rustup-init -y --default-toolchain 1.53.0 --default-host x86_64-unknown-linux-${{ matrix.MANYLINUX.LIBC }}
+          ./rustup-init -y --default-toolchain 1.53.0 --default-host ${{ matrix.MANYLINUX.ARCH }}-unknown-linux-${{ matrix.MANYLINUX.LIBC }}
           . "$HOME/.cargo/env"
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
       - uses: actions/checkout@v1 # Need v1 because manylinux2010 can't run node from v2
